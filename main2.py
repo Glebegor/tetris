@@ -150,13 +150,14 @@ class Piece():
     def __create_boxes(self, start_point):
         boxes = []
         off_x, off_y = start_point
+        color = self.__random__color()
         for coord in self.__shape.coords:
             x, y = coord
             box = self.canvas.create_rectangle(x * Tetris.BOX_SIZE + off_x,
                                                y * Tetris.BOX_SIZE + off_y,
                                                x * Tetris.BOX_SIZE + Tetris.BOX_SIZE + off_x,
                                                y * Tetris.BOX_SIZE + Tetris.BOX_SIZE + off_y,
-                                               fill=self.__random__color(),
+                                               fill=color,
                                                tags="game")
             boxes += [box]
 
@@ -220,8 +221,10 @@ class Tetris():
         elif event.char in ["d", "D", "\uf703"]:
             self.current_piece.move((1, 0))
             self.update_predict()
-        elif event.char in ["s", "S", "\uf701"]:
+        elif event.char in [" ", " ", "\uf701"]:
             self.hard_drop()
+        elif event.char in ["s", "S", "\uf701"]:
+            self.faster_drop()
         elif event.char in ["w", "W", "\uf700"]:
             self.current_piece.rotate()
             self.update_predict()
@@ -273,10 +276,17 @@ class Tetris():
                 return
             else:
                 self._blockcount += 1
-                self.score += 1
+                self.score += 10
+                self.__set_level(round(self.score/5000)+1)
+
 
         self.root.after(self.speed, self.drop)
 
+    def faster_drop(self):
+        if not self.current_piece.move((0,1)):
+            self.game_board = self.canvas.game_board()
+            self.update_piece()
+            
     def hard_drop(self):
         self.current_piece.move(self.current_piece.predict_movement(self.game_board))
 
@@ -317,6 +327,7 @@ class Tetris():
             self.score += 3000
         elif completed_line >= 4:
             self.score += 12000
+        
 
     def __game_canvas(self):
         self.canvas = GameCanvas(self.root, 
