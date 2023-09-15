@@ -284,8 +284,17 @@ class Tetris():
 
     def faster_drop(self):
         if not self.current_piece.move((0,1)):
+            self.current_piece.remove_predicts()
+            self.completed_lines()
             self.game_board = self.canvas.game_board()
             self.update_piece()
+
+            if self.is_game_over():
+                return
+            else:
+                self._blockcount += 1
+                self.score += 10
+                self.__set_level(round(self.score/5000)+1)
             
     def hard_drop(self):
         self.current_piece.move(self.current_piece.predict_movement(self.game_board))
@@ -365,7 +374,7 @@ class Tetris():
         return self._level
 
     def __set_level(self, level):
-        self.speed = 500 - (level - 1) * 25
+        self.speed = 500 - (level - 1) * 50
         self._level = level
         self.update_status()
 
