@@ -1,5 +1,14 @@
 from tkinter import Canvas, Label, Tk, StringVar, Button, LEFT
 from random import choice, randint
+from threading import Thread
+from pygame import mixer
+
+
+def music():
+    mixer.init()
+    mixer.music.load('tetris_mus.mp3')
+
+    mixer.music.play(-1)
 
 class GameCanvas(Canvas):
     def clean_line(self, boxes_to_delete):
@@ -397,5 +406,6 @@ class Tetris():
     blockcount = property(__get_blockcount, __set_blockcount)
 
 if __name__ == '__main__':
+    Thread(target = music, daemon=True).start()
     game = Tetris(predictable = True)
     game.start()
